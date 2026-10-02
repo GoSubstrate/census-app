@@ -32,6 +32,12 @@ What the scanner reads, and what it never reads, is written at the top of each s
 tools and agent setup files, never opens your code, chats or personal folders, and sends one JSON summary.
 `SUBSTRATE_DRY_RUN=1` prints that summary without sending it. The app itself reads, stores and sends nothing.
 
+## The optional email
+
+The start screen asks for an email, optional. With one, the scanner's `SUBSTRATE_EMAIL` and `SUBSTRATE_THEME` are set
+in its environment (never on a command line), and gosubstrate.com emails the dashboard link and follows up. It is
+remembered on this computer for the next run.
+
 ## While it runs
 
 The space under the progress bar is used:

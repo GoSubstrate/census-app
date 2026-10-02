@@ -137,7 +137,43 @@ listen<InstallEvent>("companion", (e) => {
   if (s && s.kind === "app" && s.app === e.payload.app) renderPromo();
 });
 
+// ---------- the optional email ----------
+// Kept on this computer only (localStorage), so "Run it again" does not ask twice. Sent once, inside the scan.
+const EMAIL_KEY = "census.email";
+const EMAIL_RE = /^[^\s@"'`$<>;|&\\]+@[^\s@"'`$<>;|&\\]+\.[^\s@"'`$<>;|&\\]+$/;
+const HINT = "We email you the dashboard link, and follow up with how to move up the ladder.";
+const emailEl = $<HTMLInputElement>("email");
+emailEl.value = localStorage.getItem(EMAIL_KEY) || "";
+
+/** The typed address: "" when empty, null when it is not an address. */
+function readEmail(): string | null {
+  const v = emailEl.value.trim();
+  if (!v) return "";
+  return v.length <= 254 && EMAIL_RE.test(v) ? v : null;
+}
+
+emailEl.addEventListener("input", () => {
+  emailEl.removeAttribute("aria-invalid");
+  $("emailHint").textContent = HINT;
+  $("emailHint").classList.remove("bad");
+});
+emailEl.addEventListener("keydown", (e) => e.key === "Enter" && start());
+
+let sentTo = "";
+
 async function start() {
+  const email = readEmail();
+  if (email === null) {
+    emailEl.setAttribute("aria-invalid", "true");
+    $("emailHint").textContent = "That does not look like an email address. Fix it, or clear it to run without one.";
+    $("emailHint").classList.add("bad");
+    emailEl.focus();
+    show("idle");
+    return;
+  }
+  if (email) localStorage.setItem(EMAIL_KEY, email);
+  else localStorage.removeItem(EMAIL_KEY);
+  sentTo = email;
   tracker = new Tracker();
   log = [];
   lastError = "";
@@ -150,7 +186,8 @@ async function start() {
   timer = window.setInterval(paint, 250);
   showPromo();
   try {
-    await invoke("start_census");
+    const theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    await invoke("start_census", { email: sentTo || null, theme });
   } catch (e) {
     finish(null, String(e));
   }
@@ -177,6 +214,8 @@ function finish(code: number | null, launchError = "") {
     $("score").textContent = result.score == null ? "?" : String(result.score);
     $("band").textContent = result.band ?? "";
     $("headline").textContent = result.headline ?? "";
+    $("sent").textContent = sentTo ? `We are emailing this link to ${sentTo}.` : "";
+    $("sent").hidden = !sentTo;
     show("done");
     return;
   }

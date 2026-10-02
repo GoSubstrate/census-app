@@ -39,15 +39,46 @@ struct Runner {
 }
 type Shared = Arc<Runner>;
 
+/// The optional contact the person typed: the scanner's `SUBSTRATE_EMAIL` (it emails the dashboard link) and
+/// `SUBSTRATE_THEME` (light or dark, which email template). Passed in the environment, never on a command line, so
+/// no shell ever parses it. The scanner validates both again and drops anything malformed.
+#[derive(Clone, Default)]
+struct Contact {
+    email: Option<String>,
+    theme: Option<&'static str>,
+}
+
+/// A plain address, or None: one `@`, a dot after it, no spaces, quotes or control characters, at most 254 chars.
+fn clean_email(raw: &str) -> Option<String> {
+    let e = raw.trim();
+    let (local, domain) = e.split_once('@')?;
+    let ok = e.len() <= 254
+        && !local.is_empty()
+        && domain.contains('.')
+        && !domain.starts_with('.')
+        && !domain.ends_with('.')
+        && !domain.contains('@')
+        && e.chars().all(|c| c.is_ascii_graphic() && !matches!(c, '"' | '\'' | '`' | '\\' | '$' | '<' | '>' | ';' | '|' | '&'));
+    ok.then(|| e.to_string())
+}
+
 #[tauri::command]
-fn start_census(app: AppHandle, runner: State<'_, Shared>) -> Result<(), String> {
+fn start_census(app: AppHandle, runner: State<'_, Shared>, email: Option<String>, theme: Option<String>) -> Result<(), String> {
+    let contact = Contact {
+        email: email.as_deref().and_then(clean_email),
+        theme: match theme.as_deref() {
+            Some("dark") => Some("dark"),
+            Some("light") => Some("light"),
+            _ => None,
+        },
+    };
     if runner.busy.swap(true, Ordering::SeqCst) {
         return Err("A census is already running.".into());
     }
     runner.cancelled.store(false, Ordering::SeqCst);
     let runner = runner.inner().clone();
     std::thread::spawn(move || {
-        let code = run_scanner(&app, &runner);
+        let code = run_scanner(&app, &runner, &contact);
         runner.busy.store(false, Ordering::SeqCst);
         let code = if runner.cancelled.load(Ordering::SeqCst) { None } else { code };
         let _ = app.emit("census", Output::Exit { code });
@@ -111,10 +142,23 @@ fn cancel_census(runner: State<'_, Shared>) {
 
 /// Runs each way of starting the scanner in turn until one of them actually starts it (prints an event).
 /// Returns the scanner's exit code.
-fn run_scanner(app: &AppHandle, runner: &Shared) -> Option<i32> {
+fn run_scanner(app: &AppHandle, runner: &Shared, contact: &Contact) -> Option<i32> {
     let attempts = attempts();
     let last = attempts.len() - 1;
     for (i, mut cmd) in attempts.into_iter().enumerate() {
+        match (&contact.email, contact.theme) {
+            (Some(email), theme) => {
+                cmd.env("SUBSTRATE_EMAIL", email);
+                match theme {
+                    Some(t) => cmd.env("SUBSTRATE_THEME", t),
+                    None => cmd.env_remove("SUBSTRATE_THEME"),
+                };
+            }
+            // No address typed: none leaks in from the environment either.
+            (None, _) => {
+                cmd.env_remove("SUBSTRATE_EMAIL").env_remove("SUBSTRATE_THEME");
+            }
+        }
         if runner.cancelled.load(Ordering::SeqCst) {
             return None;
         }
@@ -303,4 +347,19 @@ pub fn run() {
                 }
             }
         });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::clean_email;
+
+    #[test]
+    fn emails() {
+        assert_eq!(clean_email("  ada@example.com "), Some("ada@example.com".into()));
+        assert_eq!(clean_email("a.b+tag@sub.example.co"), Some("a.b+tag@sub.example.co".into()));
+        for bad in ["", "ada", "ada@", "@example.com", "ada@example", "ada@.com", "ada@example.", "a b@x.com", "a@b@c.com", "a$(x)@b.com", "a`x`@b.com", "a;rm@b.com"] {
+            assert_eq!(clean_email(bad), None, "{bad}");
+        }
+        assert_eq!(clean_email(&format!("{}@b.com", "a".repeat(260))), None);
+    }
 }

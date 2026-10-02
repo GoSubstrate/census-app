@@ -23,6 +23,11 @@
           A short scan of the AI tools on this computer, and how far the work has moved from you to the machine.
           It counts what is installed and wired. It never opens your files, code or chats.
         </p>
+        <label class="field">
+          <span class="field-label">Your email <span class="opt">optional</span></span>
+          <input id="email" type="email" placeholder="you@company.com" autocomplete="email" spellcheck="false" maxlength="254" />
+          <span class="field-hint" id="emailHint">We email you the dashboard link, and follow up with how to move up the ladder.</span>
+        </label>
         <div class="actions start">
           <button class="primary" id="run">Run the census</button>
           <a href="#" class="quiet" id="what">What it reads</a>
@@ -52,6 +57,7 @@
           <div class="number"><span id="score">0</span><small>/ 100</small></div>
           <div class="band" id="band"></div>
           <p class="headline" id="headline"></p>
+          <p class="sent" id="sent" hidden></p>
         </div>
         <div class="actions">
           <button class="primary" id="open">Open your dashboard</button>
