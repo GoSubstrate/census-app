@@ -147,7 +147,10 @@ button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px soli
   cursor: pointer;
 }
 .quiet:hover { color: var(--accent); }
-#cancel, #again { margin-top: auto; }
+#cancel { margin-top: auto; }
+/* Bottom row of the result and error screens: Run it again on the left, Quit on the right. */
+.foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.foot .quiet { align-self: center; }
 
 /* Progress */
 .bar { height: 10px; border-radius: 999px; background: var(--track); overflow: hidden; }

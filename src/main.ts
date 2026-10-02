@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { Tracker, parseLine, type CensusEvent } from "./progress";
 import { DWELL, installWords, slides, type Offer, type Slide } from "./promo";
@@ -238,7 +239,20 @@ function copy(text: string, button: HTMLElement) {
   });
 }
 
+// The whole background drags the window: a press on anything that is not a control starts a native drag. One thin
+// strip was the only handle before, and without core:window:allow-start-dragging it did nothing.
+const CONTROLS = "button, a, input, textarea, select, summary, details, pre, label, [data-no-drag]";
+document.addEventListener("mousedown", (e) => {
+  if (e.button !== 0 || (e.target as HTMLElement).closest(CONTROLS)) return;
+  e.preventDefault();
+  getCurrentWindow().startDragging().catch(() => {});
+});
+
+const quit = () => invoke("quit").catch(() => window.close());
+
 listen<Output>("census", (e) => onOutput(e.payload));
+$("quit").addEventListener("click", quit);
+$("quitFailed").addEventListener("click", quit);
 $("run").addEventListener("click", start);
 $("retry").addEventListener("click", start);
 $("again").addEventListener("click", (e) => (e.preventDefault(), start()));

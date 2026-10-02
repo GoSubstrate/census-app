@@ -132,6 +132,12 @@ fn install_companion(app: AppHandle, which: String) -> Result<(), String> {
     Ok(())
 }
 
+/// The Quit button on the result and error screens. Exiting runs RunEvent::Exit, which stops any scan still going.
+#[tauri::command]
+fn quit(app: AppHandle) {
+    app.exit(0);
+}
+
 #[tauri::command]
 fn cancel_census(runner: State<'_, Shared>) {
     runner.cancelled.store(true, Ordering::SeqCst);
@@ -336,7 +342,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(Shared::default())
-        .invoke_handler(tauri::generate_handler![start_census, cancel_census, companions, install_companion])
+        .invoke_handler(tauri::generate_handler![start_census, cancel_census, companions, install_companion, quit])
         .build(tauri::generate_context!())
         .expect("error while building Substrate Census")
         .run(|app, event| {

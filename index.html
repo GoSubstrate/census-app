@@ -9,7 +9,8 @@
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
-    <div class="drag" data-tauri-drag-region></div>
+    <!-- The traffic-light strip; like the rest of the background it drags the window (main.ts). -->
+    <div class="drag"></div>
     <main class="modal">
       <header class="brand">
         <img class="tile" src="/tile.svg" alt="" width="28" height="28" />
@@ -63,7 +64,10 @@
           <button class="primary" id="open">Open your dashboard</button>
           <button class="secondary" id="copy">Copy link</button>
         </div>
-        <a href="#" class="quiet" id="again">Run it again</a>
+        <div class="foot">
+          <a href="#" class="quiet" id="again">Run it again</a>
+          <button class="secondary" id="quit">Quit</button>
+        </div>
       </section>
 
       <!-- 4. When it fails -->
@@ -78,6 +82,10 @@
           <summary>Show the log</summary>
           <pre id="log"></pre>
         </details>
+        <div class="foot">
+          <span></span>
+          <button class="secondary" id="quitFailed">Quit</button>
+        </div>
       </section>
     </main>
   </body>
