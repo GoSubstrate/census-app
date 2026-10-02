@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Substrate Census</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <div class="drag" data-tauri-drag-region></div>
+    <main class="modal">
+      <header class="brand">
+        <img class="tile" src="/tile.svg" alt="" width="28" height="28" />
+        <span class="eyebrow">Substrate · AI Software Census</span>
+      </header>
+
+      <!-- 1. Before the run -->
+      <section class="view" data-view="idle">
+        <h1>Where do you stand on the <em>AI ladder?</em></h1>
+        <p class="lede">
+          A short scan of the AI tools on this computer, and how far the work has moved from you to the machine.
+          It counts what is installed and wired. It never opens your files, code or chats.
+        </p>
+        <div class="actions start">
+          <button class="primary" id="run">Run the census</button>
+          <a href="#" class="quiet" id="what">What it reads</a>
+        </div>
+      </section>
+
+      <!-- 2. While it runs -->
+      <section class="view" data-view="running" hidden>
+        <h1 id="step">Starting the census</h1>
+        <div class="card">
+          <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-labelledby="step">
+            <div class="fill" id="fill"></div>
+          </div>
+          <div class="meta">
+            <span class="detail" id="detail">Fetching the latest scanner from gosubstrate.com</span>
+            <span class="pct" id="pct">0%</span>
+          </div>
+        </div>
+        <button class="quiet" id="cancel">Cancel</button>
+      </section>
+
+      <!-- 3. The result -->
+      <section class="view" data-view="done" hidden>
+        <div class="card score">
+          <div class="number"><span id="score">0</span><small>/ 100</small></div>
+          <div class="band" id="band"></div>
+          <p class="headline" id="headline"></p>
+        </div>
+        <div class="actions">
+          <button class="primary" id="open">Open your dashboard</button>
+          <button class="secondary" id="copy">Copy link</button>
+        </div>
+        <a href="#" class="quiet" id="again">Run it again</a>
+      </section>
+
+      <!-- 4. When it fails -->
+      <section class="view" data-view="failed" hidden>
+        <h1>The scan did not finish.</h1>
+        <p class="lede" id="error"></p>
+        <div class="actions">
+          <button class="primary" id="retry">Try again</button>
+          <button class="secondary" id="copylog">Copy the log</button>
+        </div>
+        <details>
+          <summary>Show the log</summary>
+          <pre id="log"></pre>
+        </details>
+      </section>
+    </main>
+  </body>
+</html>

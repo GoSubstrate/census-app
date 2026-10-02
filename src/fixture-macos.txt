@@ -1,0 +1,47 @@
+@@census {"ev": "start", "script_version": "1.33.0", "os": "macos"}
+@@census {"ev": "done", "label": "identity", "summary": "person@laptop · macOS 15.0 · machine 0000AAAA…"}
+@@census {"ev": "done", "label": "catalog", "summary": "manifest 2026-09-27.1 · 372 known AI tools · reader=jq"}
+@@census {"ev": "phase", "label": "detection", "total": 372, "detail": "0 found"}
+@@census {"ev": "tick", "label": "detection", "cur": 25, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 50, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 75, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 100, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 125, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 150, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 175, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 200, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 225, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 250, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 275, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 300, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 325, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 350, "total": 372}
+@@census {"ev": "tick", "label": "detection", "cur": 372, "total": 372}
+@@census {"ev": "done", "label": "detection", "summary": "24 AI tools detected across 10 categories"}
+@@census {"ev": "phase", "label": "forensics", "total": 187, "detail": "probing agent setups"}
+@@census {"ev": "tick", "label": "forensics", "cur": 25, "total": 187}
+@@census {"ev": "tick", "label": "forensics", "cur": 50, "total": 187}
+@@census {"ev": "tick", "label": "forensics", "cur": 75, "total": 187}
+@@census {"ev": "tick", "label": "forensics", "cur": 100, "total": 187}
+@@census {"ev": "tick", "label": "forensics", "cur": 125, "total": 187}
+@@census {"ev": "tick", "label": "forensics", "cur": 150, "total": 187}
+@@census {"ev": "tick", "label": "forensics", "cur": 175, "total": 187}
+@@census {"ev": "tick", "label": "forensics", "cur": 187, "total": 187}
+@@census {"ev": "done", "label": "forensics", "summary": "0 subagents · 23 skills · 177 cmds · 0 hooks · 1 mcp · 1 rules"}
+@@census {"ev": "phase", "label": "scanning", "total": 0, "detail": "analyzing your agent projects for skills, subagents & rules…"}
+@@census {"ev": "done", "label": "rules", "summary": "68 rules file(s) · 37 use progressive disclosure"}
+@@census {"ev": "done", "label": "depth", "summary": "1 subagents · 42 skills · 177 cmds (global + per-project)"}
+@@census {"ev": "done", "label": "agents", "summary": "3 autonomous agent runner(s) · .maestro/cue.yaml"}
+@@census {"ev": "done", "label": "skills", "summary": "5 recognized public skill(s) named (count-only for the rest)"}
+@@census {"ev": "done", "label": "lsp", "summary": "serena_dir=false · 1 native key(s) · 3 language-server binary(ies)"}
+@@census {"ev": "done", "label": "optimizations", "summary": "0 agent(s) with efficiency features · 2 unknown"}
+@@census {"ev": "phase", "label": "artifacts", "total": 0, "detail": "checking which app capabilities are switched on…"}
+@@census {"ev": "done", "label": "artifacts", "summary": "21 capability(ies) in use · 8 toggle(s) on · 0 unknown"}
+@@census {"ev": "done", "label": "providers", "summary": "3 provider(s) · 2 public · 0 private · 1 local · 0 third-party"}
+@@census {"ev": "phase", "label": "ides", "total": 0, "detail": "enumerating AI editor extensions…"}
+@@census {"ev": "done", "label": "ides", "summary": "8 AI editor extension(s) (7 known)"}
+@@census {"ev": "phase", "label": "browsers", "total": 0, "detail": "enumerating AI browser extensions…"}
+@@census {"ev": "done", "label": "browsers", "summary": "2 AI browser extension(s) (2 known)"}
+@@census {"ev": "done", "label": "power clis", "summary": "6 installed · 5 wired to an agent"}
+@@census {"ev": "phase", "label": "submitting", "total": 0, "detail": "sending to gosubstrate.com/api/census/submit\u2026"}
+@@census {"ev": "result", "score": 62, "band": "Agent Operator", "dashboard_url": "https://gosubstrate.com/census/dashboard/?u=example", "headline": "Turn on one scheduled agent"}

@@ -1,0 +1,213 @@
+/* Substrate tokens (light = gosubstrate.com's v2.css, dark = the desktop apps' dark theme). The window follows the
+   system appearance through prefers-color-scheme; nothing here forces a mode. */
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: block;
+  src: url(/fonts/InterVariable.woff2) format("woff2");
+}
+
+:root {
+  color-scheme: light;
+  --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --gradient: linear-gradient(92deg, #be2bd0 0%, #8b2be1 70%);
+  --bg: #ffffff;
+  --wash-1: #f3eefb;
+  --wash-2: #e5dbf7;
+  --surface: #ffffff;
+  --text: #190b2b;
+  --text-2: rgba(25, 11, 43, 0.72);
+  --muted: rgba(25, 11, 43, 0.62);
+  --rule: rgba(25, 11, 43, 0.12);
+  --rule-accent: #d2a2ff;
+  --accent: #8b2be1;
+  --accent-hover: #7405c3;
+  --on-accent: #ffffff;
+  --track: #f5f0fc;
+  --danger: #c2323b;
+  --shadow: 0 16px 42px -18px rgba(25, 11, 43, 0.28);
+  --contours: url(/contours-light.svg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #130a20;
+    --wash-1: #1d1230;
+    --wash-2: #2d1a44;
+    --surface: #1d1230;
+    --text: #f3eefb;
+    --text-2: rgba(243, 238, 251, 0.72);
+    --muted: rgba(243, 238, 251, 0.62);
+    --rule: rgba(243, 238, 251, 0.14);
+    --rule-accent: #5b3684;
+    --accent: #b46bff;
+    --accent-hover: #d2a2ff;
+    --on-accent: #130a20;
+    --track: #231a2f;
+    --danger: #f07a82;
+    --shadow: 0 16px 42px -18px rgba(0, 0, 0, 0.6);
+    --contours: url(/contours-dark.svg);
+  }
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body { height: 100%; margin: 0; }
+body {
+  font: 400 14px/1.55 var(--sans);
+  color: var(--text);
+  /* The cartography: the site's survey-map contour tile over the brand wash. */
+  background: var(--contours) 0 0 / 900px 600px, linear-gradient(160deg, var(--wash-1) 0%, var(--bg) 55%, var(--wash-2) 100%);
+  background-color: var(--wash-1);
+  -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+  overflow: hidden;
+}
+
+/* macOS draws the traffic lights over the content (titleBarStyle Overlay); this strip lets the window be dragged. */
+.drag { position: fixed; inset: 0 0 auto 0; height: 34px; z-index: 10; }
+
+.modal {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 44px 40px 32px;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+.tile { display: block; border-radius: 7px; }
+.eyebrow {
+  font: 500 11px/1.4 var(--mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.view { display: flex; flex-direction: column; gap: 18px; flex: 1; }
+
+h1 {
+  margin: 0;
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+h1 em {
+  font-style: normal;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lede { margin: 0; color: var(--text-2); font-size: 14.5px; text-wrap: pretty; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+
+.actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.actions.start { margin-top: auto; }
+.actions .quiet { align-self: center; }
+
+button {
+  font: 500 14px/1 var(--sans);
+  border-radius: 8px;
+  padding: 12px 18px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, transform 0.05s;
+}
+button:active { transform: translateY(1px); }
+button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.primary { background: var(--accent); color: var(--on-accent); }
+.primary:hover { background: var(--accent-hover); }
+.secondary { background: transparent; color: var(--text); border-color: var(--rule); }
+.secondary:hover { border-color: var(--accent); }
+
+.quiet {
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  font: 500 13px/1.4 var(--sans);
+  color: var(--muted);
+  text-decoration: none;
+  cursor: pointer;
+}
+.quiet:hover { color: var(--accent); }
+#cancel, #again { margin-top: auto; }
+
+/* Progress */
+.bar { height: 10px; border-radius: 999px; background: var(--track); overflow: hidden; }
+.fill {
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background: var(--gradient);
+  transition: width 0.4s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+.fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: translateX(-100%);
+  animation: sheen 1.6s ease-in-out infinite;
+}
+@keyframes sheen { to { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .fill::after { animation: none; } .fill { transition: none; } }
+
+.meta { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-top: 12px; }
+.detail { color: var(--muted); font-size: 13px; min-height: 1.4em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pct { font: 500 12px/1 var(--mono); color: var(--text-2); font-variant-numeric: tabular-nums; }
+
+/* Result */
+.score { text-align: left; border-color: var(--rule-accent); }
+.number { display: flex; align-items: baseline; gap: 8px; }
+.number span {
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.number small { font-size: 16px; color: var(--muted); font-weight: 500; }
+.band { margin-top: 10px; font: 500 11px/1.4 var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); }
+.headline { margin: 8px 0 0; color: var(--text-2); }
+.headline:empty { display: none; }
+
+/* Failure */
+#error { color: var(--danger); }
+details { color: var(--muted); font-size: 12px; }
+summary { cursor: pointer; }
+pre {
+  margin: 8px 0 0;
+  max-height: 130px;
+  overflow: auto;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--track);
+  font: 11px/1.45 var(--mono);
+  white-space: pre-wrap;
+  word-break: break-word;
+  -webkit-user-select: text;
+  user-select: text;
+}
