@@ -13,7 +13,10 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use serde::Serialize;
+use serde_json::json;
 use tauri::{AppHandle, Emitter, Manager, RunEvent, State};
+
+mod companions;
 
 const BASE: &str = "https://gosubstrate.com/census";
 /// How long a login shell may take to start the scanner before we give up on it and run without it.
@@ -48,6 +51,52 @@ fn start_census(app: AppHandle, runner: State<'_, Shared>) -> Result<(), String>
         runner.busy.store(false, Ordering::SeqCst);
         let code = if runner.cancelled.load(Ordering::SeqCst) { None } else { code };
         let _ = app.emit("census", Output::Exit { code });
+    });
+    Ok(())
+}
+
+/// Scribe and Minutes: installed here or not, and whether the site has a build for this computer to offer.
+#[derive(Serialize)]
+struct Offer {
+    app: String,
+    name: String,
+    installed: bool,
+    offered: bool,
+}
+
+#[tauri::command]
+async fn companions() -> Vec<Offer> {
+    let platform = companions::platform();
+    companions::detect()
+        .into_iter()
+        .map(|d| {
+            let offered = !d.installed
+                && platform.is_some_and(|p| {
+                    ureq::get(&format!("{}/api/apps/{}/latest", companions::ORIGIN, d.app))
+                        .header("user-agent", concat!("SubstrateCensus/", env!("CARGO_PKG_VERSION")))
+                        .call()
+                        .ok()
+                        .and_then(|mut r| r.body_mut().read_json::<serde_json::Value>().ok())
+                        .is_some_and(|a| companions::release_from(&a, companions::ORIGIN, p).is_ok())
+                });
+            Offer { app: d.app, name: d.name, installed: d.installed, offered }
+        })
+        .collect()
+}
+
+/// Install Scribe or Minutes in the background; progress and the outcome arrive on the `companion` event.
+#[tauri::command]
+fn install_companion(app: AppHandle, which: String) -> Result<(), String> {
+    let c = companions::find(&which).ok_or("unknown app")?;
+    std::thread::spawn(move || {
+        let emit = |v: serde_json::Value| {
+            let _ = app.emit("companion", v);
+        };
+        let res = companions::install(c, &companions::Target::system(), &|p| emit(json!(p)));
+        match res {
+            Ok(at) => emit(json!({ "app": c.app, "phase": "done", "path": at.to_string_lossy() })),
+            Err(message) => emit(json!({ "app": c.app, "phase": "error", "message": message })),
+        }
     });
     Ok(())
 }
@@ -243,7 +292,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(Shared::default())
-        .invoke_handler(tauri::generate_handler![start_census, cancel_census])
+        .invoke_handler(tauri::generate_handler![start_census, cancel_census, companions, install_companion])
         .build(tauri::generate_context!())
         .expect("error while building Substrate Census")
         .run(|app, event| {

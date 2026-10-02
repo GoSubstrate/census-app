@@ -32,6 +32,20 @@ What the scanner reads, and what it never reads, is written at the top of each s
 tools and agent setup files, never opens your code, chats or personal folders, and sends one JSON summary.
 `SUBSTRATE_DRY_RUN=1` prints that summary without sending it. The app itself reads, stores and sends nothing.
 
+## While it runs
+
+The space under the progress bar is used:
+
+- **Scribe or Minutes missing** (and gosubstrate.com has a build for this computer): it cycles through the missing
+  ones, each with what it does, **Free**, and **Install**. Install asks `gosubstrate.com/api/apps/<app>/latest` for
+  this platform's installer, downloads it, refuses it unless the size and SHA-256 match what the site published,
+  then installs it: the `.app` copied into `/Applications` (or `~/Applications`) on macOS, a silent `/S` run of the
+  installer on Windows, `~/Applications/<Name>.AppImage` on Linux. Then it opens the app. Never asks for a password.
+- **Both installed:** the Substrate Diagnostic, with a button to the inquiry form.
+
+Detection only checks where the apps live (`src-tauri/src/companions.rs`); it never opens their data.
+`cargo test --lib companions -- --ignored` runs a real Scribe install into a temp folder.
+
 ## The `--events` stream
 
 With `--events` (scanner 1.33.0+) every UI step also writes one stderr line:
