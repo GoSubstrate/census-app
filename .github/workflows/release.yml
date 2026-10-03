@@ -1,6 +1,11 @@
 name: build
 
-# Every push builds all three platforms. A v* tag also publishes a GitHub release with the bundles.
+# Every push builds all three platforms, x64 and arm64. A v* tag also publishes a GitHub release with the bundles.
+# Updater bundles (.app.tar.gz, setup.exe and .AppImage .sig files) are made only when the repo secret
+# TAURI_SIGNING_PRIVATE_KEY (+ TAURI_SIGNING_PRIVATE_KEY_PASSWORD) is set: the CLI then gets
+# src-tauri/tauri.updater.conf.json. Without it the build is the same as before, with no updater artifacts.
+# gosubstrate.com serves the downloads and updates after Apps/kit/mirror-census-app.mjs (Substrate vault) copies a
+# release there.
 on:
   push:
     branches: [main]
@@ -23,7 +28,15 @@ jobs:
             args: ""
           - os: ubuntu-22.04
             args: ""
+          # arm64 Windows and Linux (free on public repos). Experimental: a failure never fails the run.
+          - os: windows-11-arm
+            args: ""
+            experimental: true
+          - os: ubuntu-24.04-arm
+            args: ""
+            experimental: true
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental == true }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -34,7 +47,7 @@ jobs:
         with:
           workspaces: src-tauri
       - name: Linux packages
-        if: matrix.os == 'ubuntu-22.04'
+        if: startsWith(matrix.os, 'ubuntu')
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
@@ -43,9 +56,11 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tauriScript: bunx tauri
-          args: ${{ matrix.args }}
+          args: ${{ matrix.args }} ${{ secrets.TAURI_SIGNING_PRIVATE_KEY != '' && '--config src-tauri/tauri.updater.conf.json' || '' }}
           tagName: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
           releaseName: Substrate Census ${{ github.ref_name }}
           releaseBody: |

@@ -13,7 +13,9 @@ disagree.
 | Windows | `-setup.exe` (per-user, no admin) or `.msi` |
 | Linux | `.AppImage`, `.deb`, `.rpm` |
 
-Downloads: [Releases](https://github.com/GoSubstrate/census-app/releases/latest).
+x64 and arm64 builds for Windows and Linux (the arm64 runners are experimental: a failed arm64 build never fails
+the run). Downloads: [gosubstrate.com/census](https://gosubstrate.com/census/) once a release is mirrored there,
+and [Releases](https://github.com/GoSubstrate/census-app/releases/latest).
 
 ## What it runs
 
@@ -66,17 +68,29 @@ With `--events` (scanner 1.33.0+) every UI step also writes one stderr line:
 Events: `start`, `phase` (`total` 0 = a step with no count), `tick`, `done`, `error`, `result`. The Rust side
 (`src-tauri/src/lib.rs`) forwards every stderr line; `src/progress.ts` maps the labels onto one bar.
 
+## Updates
+
+On launch the app asks `https://gosubstrate.com/api/apps/census/update/{{target}}/{{arch}}/{{current_version}}`
+(Tauri updater, `src-tauri/src/updates.rs`). When a newer signed build is registered there, the start screen shows
+**Update**; it never updates mid-scan. The plugin installs a bundle only if its minisign signature verifies against
+the public key in `tauri.conf.json` (`plugins.updater.pubkey`). The private key is not in this repo.
+
+CI makes updater bundles (`.app.tar.gz`, and `.sig` files for the `-setup.exe` and `.AppImage`) only when the repo
+secrets `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` exist: the build then gets
+`--config src-tauri/tauri.updater.conf.json`. Without them it builds exactly as before, installers only. A release
+reaches gosubstrate.com through a mirror script in the Substrate repo, which verifies every `.sig` before upload.
+
 ## Build
 
 ```sh
 bun install
-bun test               # progress mapping, against a recorded run
+bun test               # progress mapping (against a recorded run), promo, updater config
 bun run tauri dev      # run it
 bun run tauri build    # bundle for this OS
 ```
 
-Tauri 2, Vite, TypeScript, no framework. Pushing a `v*` tag builds all three platforms in GitHub Actions and
-publishes a release.
+Tauri 2, Vite, TypeScript, no framework. Every push builds macOS (universal), Windows and Linux (x64 and arm64) in
+GitHub Actions; pushing a `v*` tag also publishes a release.
 
 ## First launch
 

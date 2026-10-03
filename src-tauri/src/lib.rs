@@ -17,6 +17,7 @@ use serde_json::json;
 use tauri::{AppHandle, Emitter, Manager, RunEvent, State};
 
 mod companions;
+mod updates;
 
 const BASE: &str = "https://gosubstrate.com/census";
 /// How long a login shell may take to start the scanner before we give up on it and run without it.
@@ -341,8 +342,18 @@ fn kill_tree(pid: u32) {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(Shared::default())
-        .invoke_handler(tauri::generate_handler![start_census, cancel_census, companions, install_companion, quit])
+        .manage(updates::Pending::default())
+        .invoke_handler(tauri::generate_handler![
+            start_census,
+            cancel_census,
+            companions,
+            install_companion,
+            quit,
+            updates::check_update,
+            updates::install_update
+        ])
         .build(tauri::generate_context!())
         .expect("error while building Substrate Census")
         .run(|app, event| {

@@ -250,6 +250,25 @@ document.addEventListener("mousedown", (e) => {
 
 const quit = () => invoke("quit").catch(() => window.close());
 
+// ---------- updates (src-tauri/src/updates.rs) ----------
+
+async function checkUpdate() {
+  const version = await invoke<string | null>("check_update").catch(() => null);
+  if (!version) return;
+  $("updateText").textContent = `Version ${version} is ready.`;
+  $("update").hidden = false;
+}
+
+async function installUpdate() {
+  const btn = $<HTMLButtonElement>("updateNow");
+  btn.disabled = true;
+  $("updateText").textContent = "Downloading the update…";
+  await invoke("install_update").catch((err) => {
+    $("updateText").textContent = String(err);
+    btn.disabled = false;
+  });
+}
+
 listen<Output>("census", (e) => onOutput(e.payload));
 $("quit").addEventListener("click", quit);
 $("quitFailed").addEventListener("click", quit);
@@ -261,4 +280,6 @@ $("what").addEventListener("click", (e) => (e.preventDefault(), openUrl(PRIVACY_
 $("open").addEventListener("click", () => result?.dashboard_url && openUrl(result.dashboard_url));
 $("copy").addEventListener("click", (e) => result?.dashboard_url && copy(result.dashboard_url, e.currentTarget as HTMLElement));
 $("copylog").addEventListener("click", (e) => copy(log.join("\n"), e.currentTarget as HTMLElement));
+$("updateNow").addEventListener("click", installUpdate);
 show("idle");
+checkUpdate();
