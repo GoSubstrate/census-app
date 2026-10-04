@@ -281,5 +281,6 @@ $("open").addEventListener("click", () => result?.dashboard_url && openUrl(resul
 $("copy").addEventListener("click", (e) => result?.dashboard_url && copy(result.dashboard_url, e.currentTarget as HTMLElement));
 $("copylog").addEventListener("click", (e) => copy(log.join("\n"), e.currentTarget as HTMLElement));
 $("updateNow").addEventListener("click", installUpdate);
+$("access").hidden = !navigator.userAgent.includes("Macintosh");
 show("idle");
 checkUpdate();

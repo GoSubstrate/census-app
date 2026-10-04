@@ -15,7 +15,7 @@
         "label": "main",
         "title": "Substrate Census",
         "width": 520,
-        "height": 540,
+        "height": 600,
         "resizable": false,
         "maximizable": false,
         "center": true,

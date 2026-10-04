@@ -29,6 +29,11 @@
           <input id="email" type="email" placeholder="you@company.com" autocomplete="email" spellcheck="false" maxlength="254" />
           <span class="field-hint" id="emailHint">We email you the dashboard link, and follow up with how to move up the ladder.</span>
         </label>
+        <!-- macOS only (main.ts): the OS asks before the scanner can read some folders and other apps' data. -->
+        <p class="notice" id="access" hidden>
+          macOS may ask to let Substrate Census read some folders or other apps' data. The scan is read-only and
+          sends only metadata, never your files. Decline if you like; your score will just be less accurate.
+        </p>
         <div class="actions start">
           <button class="primary" id="run">Run the census</button>
           <a href="#" class="quiet" id="what">What it reads</a>

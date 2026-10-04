@@ -277,5 +277,6 @@ pre {
 .field input[aria-invalid="true"] { border-color: var(--danger); }
 .field-hint { font-size: 12.5px; color: var(--muted); }
 .field-hint.bad { color: var(--danger); }
+.notice { margin: 0; padding: 10px 12px; font-size: 12.5px; color: var(--text-2); border-left: 2px solid var(--rule-accent); background: var(--surface); border-radius: 0 8px 8px 0; text-wrap: pretty; }
 .update { margin: 0; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 12.5px; color: var(--muted); }
 .sent { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
