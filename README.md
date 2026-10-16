@@ -94,8 +94,20 @@ GitHub Actions; pushing a `v*` tag also publishes a release.
 
 ## First launch
 
-The builds are not signed with an Apple Developer ID or a Windows code-signing certificate yet.
+Existing downloads predate company Windows signing. macOS builds are not signed with an Apple Developer ID yet. Future Windows releases require the company signing checks below; unsigned development builds are not release installers.
 
 - **macOS**: double-click shows "cannot be opened". Open **System Settings > Privacy & Security** and click
   **Open Anyway** (or right-click the app, **Open**). Once only.
 - **Windows**: SmartScreen shows "Windows protected your PC". Click **More info**, then **Run anyway**.
+
+## Windows company signing
+
+Windows release builds require Azure Artifact Signing with publisher `Substrate Holdings LLC`. Ordinary PR and main builds remain unsigned development builds. A manual `release.yml` run with `sign_windows=true` creates signed build artifacts without publishing a release. Only pushed version tags publish. Do not push a tag just to test signing.
+
+Before enabling signing, create the `windows-signing` GitHub environment with approved branch/tag restrictions and reviewers where available. Azure OIDC federation must trust `repo:GoSubstrate/census-app:environment:windows-signing` with issuer `https://token.actions.githubusercontent.com` and audience `api://AzureADTokenExchange`. Grant the CI principal only Artifact Signing Certificate Profile Signer on the approved company profile. No Azure client password is needed.
+
+Repository variables: `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, `TRUSTED_SIGNING_ENDPOINT`, `TRUSTED_SIGNING_ACCOUNT`, `TRUSTED_SIGNING_PROFILE`. Use the shared company account and Public Trust profile. Company identity approval and the first live signing test are still pending.
+
+`scripts/windows-sign-setup.ps1` installs the pinned Microsoft signing client and .NET 8 x64, and creates the Tauri signing configuration. Tauri signs the app and NSIS installer before its updater signature is created. `windows-sign.ps1` refuses success unless the signature is valid, timestamped and names the company. The x64 signing tools also sign ARM64 output; a live ARM64 validation is still required. These helpers are shared with the Substrate build kit; keep the copies identical when updating them.
+
+Run `powershell -File scripts/windows-signing.test.ps1` for offline publisher, timestamp and failure regression checks. After approval, validate with `gh workflow run release.yml --ref <reviewed-branch> -f sign_windows=true`, then download the Windows workflow artifacts. This command does not publish. Authenticode establishes the publisher; it does not guarantee immediate SmartScreen reputation.
