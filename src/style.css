@@ -34,19 +34,19 @@
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --bg: #130a20;
-    --wash-1: #1d1230;
-    --wash-2: #2d1a44;
-    --surface: #1d1230;
+    --bg: #1b1328;
+    --wash-1: #241a35;
+    --wash-2: #362350;
+    --surface: #241a35;
     --text: #f3eefb;
     --text-2: rgba(243, 238, 251, 0.72);
     --muted: rgba(243, 238, 251, 0.62);
     --rule: rgba(243, 238, 251, 0.14);
-    --rule-accent: #5b3684;
+    --rule-accent: #5f3a8a;
     --accent: #b46bff;
     --accent-hover: #d2a2ff;
     --on-accent: #130a20;
-    --track: #231a2f;
+    --track: #2d2340;
     --danger: #f07a82;
     --shadow: 0 16px 42px -18px rgba(0, 0, 0, 0.6);
     --contours: url(/contours-dark.svg);
